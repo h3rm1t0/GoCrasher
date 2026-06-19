@@ -73,7 +73,7 @@ func Crasher(alvo string, corrompido []byte) {
 			dir := filepath.Join("Crashs", nome_arq_final)
 			err := os.WriteFile(dir, corrompido, 0644)
 			if err == nil {
-				fmt.Printf("%s - [!! %s !!] Payload fatal salvo em: %s\n", momento(), tipoCrash, dir)
+				fmt.Printf("%s - [!! %s !!] Payload salvo em: %s\n", momento(), tipoCrash, dir)
 			}
 		}
 	}
