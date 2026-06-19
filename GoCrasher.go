@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
+	"context"
 	"crypto/md5"
-	crand "crypto/rand" // Alias para evitar colisão com math/rand
+	crand "crypto/rand"
 	"fmt"
 	"math/big"
 	"math/rand"
@@ -28,32 +30,50 @@ func GerarStringRandomica(i int) string {
 
 func Crasher(alvo string, corrompido []byte) {
 	os.MkdirAll("Crashs", 0755)
-	ext := ".ini"
 
-	corromp_arq := GerarStringRandomica(5) + ext
-	err := os.WriteFile(corromp_arq, corrompido, 0644)
-	if err != nil {
-		fmt.Printf("%s - Falha ao salvar arquivo temporário\n", momento())
-		return
-	}
-	defer os.Remove(corromp_arq)
+	ctx, cancel := context.WithTimeout(context.Background(), 50*time.Millisecond)
+	defer cancel()
 
-	cmd := exec.Command("./"+alvo, corromp_arq)
+	cmd := exec.CommandContext(ctx, "./"+alvo)
+
+	cmd.Stdin = bytes.NewReader(corrompido)
+
+	var bufferErros bytes.Buffer
+	cmd.Stderr = &bufferErros
+
+	// Dispara a execução
 	err_pg := cmd.Run()
 
+	if ctx.Err() == context.DeadlineExceeded {
+		return
+	}
+
+	crashDetectado := false
+	tipoCrash := ""
+
 	if err_pg != nil {
-		if exitErr, ok := err_pg.(*exec.ExitError); ok {
+		saidaErroStr := bufferErros.String()
+
+		if strings.Contains(saidaErroStr, "AddressSanitizer:") {
+			crashDetectado = true
+			tipoCrash = "ASAN_LEAK"
+		} else if exitErr, ok := err_pg.(*exec.ExitError); ok {
 			if status, ok := exitErr.Sys().(syscall.WaitStatus); ok {
 				if status.Signaled() && status.Signal() == syscall.SIGSEGV {
-					string_aleatoria := GerarStringRandomica(5)
-					hash := md5.Sum([]byte(string_aleatoria))
-					nome_arq_final := fmt.Sprintf("%x%s", hash, ext)
-					dir := filepath.Join("Crashs", nome_arq_final)
-					err = os.WriteFile(dir, corrompido, 0644)
-					if err == nil {
-						fmt.Printf("%s - [CRASH DETECTADO] Payload salvo em: %s\n", momento(), dir)
-					}
+					crashDetectado = true
+					tipoCrash = "SIGSEGV"
 				}
+			}
+		}
+
+		if crashDetectado {
+			string_aleatoria := GerarStringRandomica(5)
+			hash := md5.Sum([]byte(string_aleatoria))
+			nome_arq_final := fmt.Sprintf("%x.ini", hash)
+			dir := filepath.Join("Crashs", nome_arq_final)
+			err := os.WriteFile(dir, corrompido, 0644)
+			if err == nil {
+				fmt.Printf("%s - [!! %s !!] Payload fatal salvo em: %s\n", momento(), tipoCrash, dir)
 			}
 		}
 	}
@@ -96,7 +116,7 @@ func main() {
 		fmt.Printf("%s - Falha ao abrir a seed.\n", momento())
 		return
 	}
-	
+
 	numWorkers := 10
 	fmt.Printf("%s - [START] Iniciando Motor de Fuzzing...\n", momento())
 	fmt.Printf("%s - Alvo: %s | Semente: %s | Threads Ativas: %d\n", momento(), alvo, os.Args[1], numWorkers)
@@ -108,7 +128,7 @@ func main() {
 	for i := 1; i <= numWorkers; i++ {
 		go Worker(i, alvo, seed)
 	}
-	<-bloqueio 
+	<-bloqueio
 }
 
 func momento() string {
