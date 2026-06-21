@@ -15,8 +15,8 @@ O projeto foi construído do zero para atuar na triagem agressiva de *parsers* c
 Este projeto é um artefato técnico desenvolvido estritamente para estudos avançados em engenharia reversa e pesquisa independente de vulnerabilidades (Vulnerability Research). A ferramenta deve ser utilizada exclusivamente em ambientes de laboratório locais, targets sob contrato de Pentest e programas de Bug Bounty com escopo aberto. O autor não se responsabiliza pelo uso do motor contra infraestruturas onde não haja autorização explícita.
 
 ## Setup e Ambiente de Testes
-OS do Ambiente: Ubuntu 24.04.4 LTS x86_64
-Go: go version go1.22.2 linux/amd64
+- OS do Ambiente: Ubuntu 24.04.4 LTS x86_64
+- Go: go version go1.22.2 linux/amd64
 O *fuzzer* requer que o alvo seja preferencialmente compilado com instrumentação (`-fsanitize=address`) para maximizar a captura de erros *Off-by-One* e *Use-After-Free*.
 
 ## Execução Padrão:
