@@ -12,9 +12,21 @@ O projeto foi construído do zero para atuar na triagem agressiva de *parsers* c
 * **Prevenção de Livelock/Hang:** Implementação de limite de tempo de execução via pacote `context`, assassinando processos alvos que entram em laços infinitos e liberando as *threads* do fuzzer.
 * **Alertas em Tempo Real:** Integração nativa com a API do Telegram para notificação imediata (*Push*) no momento em que um *crash* explorável é salvo no disco.
 
+**Aviso Educacional**
+Este projeto é um artefato técnico desenvolvido estritamente para estudos avançados em engenharia reversa e pesquisa independente de vulnerabilidades (Vulnerability Research). A ferramenta deve ser utilizada exclusivamente em ambientes de laboratório locais, targets sob contrato de Pentest e programas de Bug Bounty com escopo aberto. O autor não se responsabiliza pelo uso do motor contra infraestruturas onde não haja autorização explícita.
+
 ## Setup e Ambiente de Testes
 O *fuzzer* requer que o alvo seja preferencialmente compilado com instrumentação (`-fsanitize=address`) para maximizar a captura de erros *Off-by-One* e *Use-After-Free*.
 
-**Compilação do Fuzzer:**
+
+## Execução Padrão:
+O fuzzer exige a semente mínima (corpus) e o caminho do binário alvo.
+./GoCrash <CAMINHO_DA_SEED> <NOME_DO_PROCESSO_ALVO>
+# Exemplo: ./GoCrash seed.svg magick
+Nota: Variáveis de ambiente específicas do alvo (ex: MAGICK_CONFIGURE_PATH) já estão injetadas de forma autônoma no subprocesso do motor.
+
+
+## Compilação do Fuzzer:
 ```bash
 go build -o GoCrash GoCrasher.go
+utilizada exclusivamente em ambientes de laboratório locais, targets sob contrato de Pentest e programas de Bug Bounty com escopo aberto. O autor não se responsabiliza pelo uso do motor contra infraestruturas onde não haja autorização explícita.
