@@ -21,9 +21,9 @@ O *fuzzer* requer que o alvo seja preferencialmente compilado com instrumentaç�
 
 ## Execução Padrão:
 O fuzzer exige a semente mínima (corpus) e o caminho do binário alvo.
-./GoCrash <CAMINHO_DA_SEED> <NOME_DO_PROCESSO_ALVO>
-# Exemplo: ./GoCrash seed.svg magick
-Nota: Variáveis de ambiente específicas do alvo (ex: MAGICK_CONFIGURE_PATH) já estão injetadas de forma autônoma no subprocesso do motor.
+- ./GoCrash <CAMINHO_DA_SEED> <NOME_DO_PROCESSO_ALVO>
+- Exemplo: ./GoCrash seed.svg magick
+- Nota: Variáveis de ambiente específicas do alvo (ex: MAGICK_CONFIGURE_PATH) já estão injetadas de forma autônoma no subprocesso do motor.
 
 
 ## Compilação do Fuzzer:
